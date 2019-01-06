@@ -17,7 +17,9 @@ from process.build_process import base_build_process
 
 
 class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
-
+    """
+    Jenkins build support. It will use jenkins to build your project
+    """
     J = None  # type: Jenkins
     log = logger.get_logger('JenkinsBuildProcess')
 
@@ -51,8 +53,10 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             JenkinsBuildProcess.J.build_job(self.job.name)
             JenkinsBuildProcess.log.debug(
                 '{0} build #{1} started'.format(self.job.name, self.job.get_next_build_number()))
+            return True
         else:
             JenkinsBuildProcess.log.debug('Job is None')
+            return False
 
     def get_job_status(self):
         status = None
@@ -61,7 +65,7 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             last_build = self.job.get_last_build()
         except NoResults as e:
             JenkinsBuildProcess.log.debug('NoResults exception happened')
-            status = 'PENDING'
+            status = 'NOT_KNOW'
         except Exception as e2:
             JenkinsBuildProcess.log.error(e2)
 

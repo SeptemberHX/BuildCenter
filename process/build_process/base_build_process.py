@@ -12,6 +12,9 @@ from core.build_info import BuildInfo
 
 
 class BaseBuildProcess:
+    """
+    Base class for all build processor
+    """
     def create_job(self, build_info: BuildInfo):
         pass
 
