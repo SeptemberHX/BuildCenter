@@ -46,7 +46,7 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             with open('resource/jenkins_pipeline_config.xml') as f:
                 lines = f.readlines()
             job_config = ''.join(lines).format(
-                build_info.docker_image_owner,
+                '{0}/{1}'.format(build_info.docker_image_owner, build_info.docker_image_name),
                 build_info.git_url,
                 build_info.docker_image_tag
             )
@@ -60,7 +60,7 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
         return self.next_build_number
 
     def run_job(self):
-        if self.job and self.check_if_build_finished(self.next_build_number - 1):
+        if self.job is not None and self.check_if_build_finished(self.next_build_number - 1):
             JenkinsBuildProcess.J.build_job(self.job.name)
             JenkinsBuildProcess.log.debug(
                 'Job {0} build #{1} started'.format(self.job.name, self.next_build_number))
@@ -82,7 +82,7 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
         except Exception as e2:
             JenkinsBuildProcess.log.error(e2)
 
-        if last_build:
+        if last_build is not None:
             status = last_build.get_status()
             if status is None:
                 status = BUILD_UNKNOWN
@@ -94,9 +94,14 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
         return status
 
     def check_if_build_finished(self, build_number):
-        if self.job:
+        if self.job is not None:
+            if build_number == 0:
+                return True
+
             curr_job = self.job.get_build(build_number)
-            if curr_job is not None and curr_job.get_status() == 'SUCCESS' or curr_job.get_status() == 'FAIL':
+            JenkinsBuildProcess.log.debug(
+                "Job {0}'s build #{1}'s state is {2}".format(self.job.name, build_number, curr_job.get_status()))
+            if curr_job is not None and curr_job.get_status() in [STATUS_SUCCESS, STATUS_FAIL, RESULTSTATUS_FAILED, RESULTSTATUS_FAILURE]:
                 return True
             elif curr_job is None:
                 return True

@@ -28,7 +28,16 @@
     stage('Building image') {{
       steps {{
         script {{
-          docker.build registry + ':{2}'
+          dockerImage = docker.build registry + ':{2}'
+        }}
+      }}
+    }}
+    stage('Push image') {{
+      steps {{
+        script {{
+          docker.withRegistry( '', registryCredential ) {{
+            dockerImage.push()
+          }}
         }}
       }}
     }}
