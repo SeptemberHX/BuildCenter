@@ -25,7 +25,7 @@ class BuildProcess:
         :param build_info:
         :return:
         """
-        self.build_process.create_job(build_info)
+        return self.build_process.create_job(build_info)
 
     def run_job(self):
         """
@@ -39,4 +39,4 @@ class BuildProcess:
         get last build status
         :return:
         """
-        self.build_process.get_job_status()
+        return self.build_process.get_job_status()

@@ -10,9 +10,11 @@
 
 from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.job import Job
+from jenkinsapi.constants import *
 from jenkinsapi.custom_exceptions import NoResults
 from core import config, logger
 from core.build_info import BuildInfo
+from core.constant import *
 from process.build_process import base_build_process
 
 
@@ -32,8 +34,14 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             )
             JenkinsBuildProcess.log.debug('Jenkins version: {0}'.format(JenkinsBuildProcess.J.version))
         self.job = None  # type: Job
+        self.next_build_number = 1
 
     def create_job(self, build_info: BuildInfo):
+        """
+        create a job
+        :param build_info:
+        :return: next build number
+        """
         if not JenkinsBuildProcess.J.has_job(build_info.project_name):
             with open('resource/jenkins_pipeline_config.xml') as f:
                 lines = f.readlines()
@@ -46,32 +54,50 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             JenkinsBuildProcess.log.debug('Job {0} created'.format(self.job.name))
         else:
             self.job = JenkinsBuildProcess.J.get_job(build_info.project_name)
-            JenkinsBuildProcess.log.debug('Job exists')
+            JenkinsBuildProcess.log.debug('Job {0} exists'.format(self.job.name))
+        self.next_build_number = self.job.get_next_build_number()
+        JenkinsBuildProcess.log.debug("Job {0}'s next build number is {0}".format(self.next_build_number))
+        return self.next_build_number
 
     def run_job(self):
-        if self.job:
+        if self.job and self.check_if_build_finished(self.next_build_number - 1):
             JenkinsBuildProcess.J.build_job(self.job.name)
             JenkinsBuildProcess.log.debug(
-                '{0} build #{1} started'.format(self.job.name, self.job.get_next_build_number()))
+                'Job {0} build #{1} started'.format(self.job.name, self.next_build_number))
+            self.next_build_number = self.next_build_number + 1
             return True
         else:
-            JenkinsBuildProcess.log.debug('Job is None')
+            JenkinsBuildProcess.log.debug('Job is None or last build is not finished')
             return False
 
     def get_job_status(self):
-        status = None
+        status = BUILD_UNKNOWN
         last_build = None
         try:
-            last_build = self.job.get_last_build()
+            last_build = self.job.get_build(self.next_build_number - 1)
         except NoResults as e:
             JenkinsBuildProcess.log.debug('NoResults exception happened')
-            status = 'NOT_KNOW'
+            JenkinsBuildProcess.log.debug(e)
+            status = BUILD_UNKNOWN
         except Exception as e2:
             JenkinsBuildProcess.log.error(e2)
 
         if last_build:
             status = last_build.get_status()
             if status is None:
-                status = 'NOT_KNOW'
-        JenkinsBuildProcess.log.debug('Build {0}'.format(status))
+                status = BUILD_UNKNOWN
+            elif status in [STATUS_SUCCESS]:
+                status = BUILD_SUCCESS
+            elif status in [STATUS_FAIL]:
+                status = BUILD_FAIL
+            JenkinsBuildProcess.log.debug("Job {0}'s build #{1} {2}".format(self.job.name, last_build.buildno, status))
         return status
+
+    def check_if_build_finished(self, build_number):
+        if self.job:
+            curr_job = self.job.get_build(build_number)
+            if curr_job is not None and curr_job.get_status() == 'SUCCESS' or curr_job.get_status() == 'FAIL':
+                return True
+            elif curr_job is None:
+                return True
+        return False
