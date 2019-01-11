@@ -101,7 +101,8 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
             curr_job = self.job.get_build(build_number)
             JenkinsBuildProcess.log.debug(
                 "Job {0}'s build #{1}'s state is {2}".format(self.job.name, build_number, curr_job.get_status()))
-            if curr_job is not None and curr_job.get_status() in [STATUS_SUCCESS, STATUS_FAIL, RESULTSTATUS_FAILED, RESULTSTATUS_FAILURE]:
+            if curr_job is not None and \
+                    curr_job.get_status() in [STATUS_SUCCESS, STATUS_FAIL, RESULTSTATUS_FAILED, RESULTSTATUS_FAILURE]:
                 return True
             elif curr_job is None:
                 return True

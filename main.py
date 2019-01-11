@@ -8,9 +8,10 @@
 @Version: 0.01
 """
 
-from process.process_build import BuildProcess
-from process.build_process.jenkins_build_process import JenkinsBuildProcess
+from executor.build_executor import BuildExecutor
 from core.build_info import BuildInfo
+from core.logger import get_logger
+
 
 if __name__ == '__main__':
     test_build_info = BuildInfo(
@@ -21,7 +22,9 @@ if __name__ == '__main__':
         docker_image_tag='v3',
         docker_image_owner='septemberhx',
     )
-    build_process = BuildProcess(JenkinsBuildProcess())
-    build_process.create_job(test_build_info)
-    build_process.run_job()
-    build_process.get_job_status()
+    # build_executor = BuildExecutor()
+    # build_executor.execute(test_build_info)
+    logger = get_logger('main')
+    logger.info('Info')
+    logger.debug('Debug')
+    logger.critical('Critical')
