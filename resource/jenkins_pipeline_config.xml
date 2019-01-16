@@ -25,6 +25,18 @@
         git url: '{1}'
       }}
     }}
+    stage('Maven package') {{
+        steps {{
+            withMaven(
+                // Maven installation declared in the Jenkins "Global Tool Configuration"
+                maven: 'maven') {{
+
+              // Run the maven build
+              sh "mvn clean package"
+
+            }}
+        }}
+    }}
     stage('Building image') {{
       steps {{
         script {{

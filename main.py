@@ -10,21 +10,16 @@
 
 from executor.build_executor import BuildExecutor
 from core.build_info import BuildInfo
-from core.logger import get_logger
 
 
 if __name__ == '__main__':
     test_build_info = BuildInfo(
-        project_name='test_build_2',
-        git_url='https://github.com/gustavoapolinario/microservices-node-example-todo-frontend.git',
+        project_name='docker_java_test',
+        git_url='https://github.com/SeptemberHX/java-docker-build-tutorial.git',
         git_tag='',
-        docker_image_name='docker-test',
-        docker_image_tag='v3',
+        docker_image_name='docker_java_test',
+        docker_image_tag='v1',
         docker_image_owner='septemberhx',
     )
-    # build_executor = BuildExecutor()
-    # build_executor.execute(test_build_info)
-    logger = get_logger('main')
-    logger.info('Info')
-    logger.debug('Debug')
-    logger.critical('Critical')
+    build_executor = BuildExecutor()
+    build_executor.execute(test_build_info)

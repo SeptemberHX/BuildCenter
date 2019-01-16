@@ -11,5 +11,15 @@
 JENKINS_CONFIG = {
     'username': 'septemberhx',
     'password': 'tianjianshan',
-    'server': 'http://60.205.188.102:8087',
+    'server': 'http://107.191.56.183:8087/',
+}
+
+RABBITMQ_CONFIG = {
+    'username': 'admin',
+    'password': 'tianjianshan',
+    'ip': '60.205.188.102',
+    'port': 5672,
+    'path': '/',
+    'consume_queue_name': 'tasks',
+    'reply_queue_name': 'replies',
 }
