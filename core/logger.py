@@ -10,7 +10,7 @@
 
 import logging
 
-formatter = logging.Formatter('[%(asctime)s] [ %(filename)s : %(lineno)s ] [ %(levelname)s ]\t : %(message)s')
+formatter = logging.Formatter('[%(asctime)s] [ %(filename)s:%(lineno)s ] [ %(levelname)s ]\t : %(message)s')
 logger_file_handler = logging.FileHandler('./log.log')
 logger_terminal_handler = logging.StreamHandler()
 logger_file_handler.setFormatter(formatter)

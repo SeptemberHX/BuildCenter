@@ -14,15 +14,11 @@
   <properties/>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps">
     <script>pipeline {{
-  environment {{
-    registry = '{0}'
-    registryCredential = 'dockerhub'
-  }}
   agent any
   stages {{
     stage('Cloning Git') {{
       steps {{
-        git url: '{1}'
+        git url: '{gitUrl}'
       }}
     }}
     stage('Maven package') {{
@@ -40,17 +36,25 @@
     stage('Building image') {{
       steps {{
         script {{
-          dockerImage = docker.build registry + ':{2}'
+          dockerImage = docker.build '{imageTag}'
         }}
       }}
     }}
     stage('Push image') {{
       steps {{
         script {{
-          docker.withRegistry( '', registryCredential ) {{
+          // docker.withRegistry( '', registryCredential ) {{
             dockerImage.push()
-          }}
+          // }}
         }}
+      }}
+    }}
+  }}
+  post {{
+    always {{
+      script {{
+        body = '{{"result":"' + currentBuild.currentResult + '", "projectName": "' + currentBuild.projectName + '", "number": "' + currentBuild.number + '"}}'
+        httpRequest url: '{notifyHttpUrl}', httpMode: 'POST', passBuildParameters: true, consoleLogResponseBody: true, requestBody: body
       }}
     }}
   }}

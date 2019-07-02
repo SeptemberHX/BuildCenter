@@ -10,16 +10,29 @@
 
 from executor.build_executor import BuildExecutor
 from core.build_info import BuildInfo
+from flask import Flask
+
+app = Flask(__name__)
 
 
-if __name__ == '__main__':
+def build_test():
     test_build_info = BuildInfo(
-        project_name='docker_java_test',
+        project_name='docker_java_test3',
         git_url='https://github.com/SeptemberHX/java-docker-build-tutorial.git',
         git_tag='',
         docker_image_name='docker_java_test',
         docker_image_tag='v1',
-        docker_image_owner='septemberhx',
+        docker_image_owner='192.168.1.104:5000/septemberhx',
     )
     build_executor = BuildExecutor()
     build_executor.execute(test_build_info)
+
+
+@app.route("/hello")
+def hello():
+    return "Hello, world!"
+
+
+if __name__ == '__main__':
+    # app.run(port=54321)
+    build_test()

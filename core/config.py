@@ -9,9 +9,10 @@
 """
 
 JENKINS_CONFIG = {
-    'username': 'septemberhx',
+    'username': 'SeptemberHX',
     'password': 'tianjianshan',
-    'server': 'http://107.191.56.183:8087/',
+    'server': 'http://192.168.1.104:5002/',
+    'notify_http_url': 'http://192.168.1.102:54321/message',
 }
 
 RABBITMQ_CONFIG = {
