@@ -20,7 +20,7 @@ class PomTools:
         self.dom = minidom.parse(raw_file_path)  # type: minidom.Document
 
     def change_main_class(self, new_main_class_name):
-        self.change_path_data('project/build/plugins/plugin/executions/execution/configuration/transformers/transformer/mainClass'.split('/'), new_main_class_name)
+        self.change_path_data('project/build/plugins/plugin/configuration/mainClass'.split('/'), new_main_class_name)
 
     def change_artifactId(self, new_artifactId):
         self.change_path_data('project/artifactId'.split('/'), new_artifactId)
@@ -30,7 +30,7 @@ class PomTools:
             self.dom.writexml(file)
 
     def get_main_class(self):
-        return self.get_path_data('project/build/plugins/plugin/executions/execution/configuration/transformers/transformer/mainClass'.split('/'))
+        return self.get_path_data('project/build/plugins/plugin/configuration/mainClass'.split('/'))
 
     def get_path_data(self, tags: List[str]):
         """

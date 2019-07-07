@@ -23,3 +23,6 @@ class BaseBuildProcess:
 
     def get_job_status(self):
         pass
+
+    def finish_job(self, job_id: str):
+        pass

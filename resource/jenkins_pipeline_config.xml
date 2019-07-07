@@ -15,10 +15,13 @@
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps">
     <script>pipeline {{
   agent any
+  environment {{
+    module = '{module_name}'
+  }}
   stages {{
     stage('Cloning Git') {{
       steps {{
-        git url: '{gitUrl}'
+        git url: '{gitUrl}', branch: '{branch}', credentialsId: '{credentialsId}'
       }}
     }}
     stage('Maven package') {{
@@ -28,7 +31,7 @@
                 maven: 'maven') {{
 
               // Run the maven build
-              sh "mvn clean package"
+              sh "mvn clean package -pl {module_name} -am"
 
             }}
         }}
@@ -36,7 +39,11 @@
     stage('Building image') {{
       steps {{
         script {{
-          dockerImage = docker.build '{imageTag}'
+          dir = '.'
+          if (module != '.') {{
+            dir = module
+          }}
+          dockerImage = docker.build '{imageTag}', dir
         }}
       }}
     }}

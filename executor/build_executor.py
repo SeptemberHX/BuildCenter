@@ -8,9 +8,7 @@
 @Version: 0.01
 """
 
-import time
 from core.build_info import BuildInfo
-from core.constant import *
 from core.logger import get_logger
 from process.process_build import BuildProcess
 from process.build_process.jenkins_build_process import JenkinsBuildProcess
@@ -25,3 +23,6 @@ class BuildExecutor:
 
     def execute(self, build_info: BuildInfo):
         self.build_process.create_job(build_info)
+
+    def finish(self, job_id: str):
+        self.build_process.finish_job(job_id)

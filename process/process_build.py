@@ -40,3 +40,6 @@ class BuildProcess:
         :return:
         """
         return self.build_process.get_job_status()
+
+    def finish_job(self, job_id: str):
+        return self.build_process.finish_job(job_id)
