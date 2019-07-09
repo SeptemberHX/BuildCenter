@@ -16,6 +16,12 @@ JENKINS_CONFIG = {
     'credentials_id': '489a5191-b67d-4aad-943d-94dadf733aff',
 }
 
+CLUSTER_CONFIG = {
+    'server_ip': '192.168.1.102',
+    'server_port': 9001,
+    'notify_path': '/mserver/notifyJob',
+}
+
 RABBITMQ_CONFIG = {
     'username': 'admin',
     'password': 'tianjianshan',

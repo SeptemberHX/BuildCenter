@@ -50,7 +50,8 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
                 notifyHttpUrl=config.JENKINS_CONFIG['notify_http_url'],
                 module_name=build_info.module_name,
                 credentialsId=config.JENKINS_CONFIG['credentials_id'],
-                branch=build_info.branch
+                branch=build_info.branch,
+                build_id=build_info.id
             )
 
             if JenkinsBuildProcess.J.job_exists(build_info.project_name):

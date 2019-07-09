@@ -7,15 +7,18 @@
 @Date: 2019-01-06
 @Version: 0.01
 """
+from urllib.parse import urlencode, urljoin
 
 from executor.build_executor import BuildExecutor
 from core.build_info import BuildInfo
+from core import config
 from flask import Flask, request
 import json
 from core import logger
 import git
 import os
 from tools import pom_tools
+import requests
 
 app = Flask(__name__)
 log = logger.get_logger('main')
@@ -36,15 +39,15 @@ test_build_info = BuildInfo(
     project_name='MFramework',
     git_url='git@192.168.1.104:SeptemberHX/mframework.git',
     git_tag='',
-    docker_image_name='sampleservice',
-    docker_image_tag='v1.3',
+    docker_image_name='sampleservice1',
+    docker_image_tag='v1.0.1',
     docker_image_owner='192.168.1.104:5000/septemberhx',
-    class_name='com.septemberhx.sampleservice.controller.PeterController',
-    url='/peter',
     id='1',
-    module_name='SampleService',
-    branch='test2'
+    module_name='SampleService1',
+    branch='master'
 )
+
+during_building_dict = {}  # type: dict[str, BuildInfo]
 
 
 def build_test():
@@ -55,18 +58,48 @@ def build_test():
 def jenkins_message_receiver():
     data = request.get_data()
     data_json = json.loads(data)
-    log.info(data_json)
+    log.info('Receive build result: {0}'.format(data_json))
+    if 'buildId' in data_json:
+        log.info('Build job finished: {0}'.format(data_json['buildId']))
+        notify_job_finished(data_json['buildId'])
     return 'Received'
 
 
-@app.route("/buildcenter/buildjob", methods=['POST'])
-def start_build_job():
-    job_info = json.loads(request.get_data())
-    log.info('Job received: {0}'.format(job_info))
-    build_info = BuildInfo(job_info['projectName'], job_info['gitUrl'], job_info['gitTag'], job_info['imageName'],
-                           job_info['imageTag'], job_info['imageOwner'], job_info['id'])
+def build_job(build_info: BuildInfo):
+    log.info('Start to build {0}: {1}'.format(build_info.id, build_info))
+    during_building_dict[build_info.id] = build_info
     build_executor.execute(build_info)
-    return 'Received'
+
+
+def notify_job_finished(build_id: str):
+    parameter = {
+        'jobId': build_id
+    }
+    data = urlencode(parameter)
+    url = urljoin('http://{0}:{1}'.format(config.CLUSTER_CONFIG['server_ip'], config.CLUSTER_CONFIG['server_port']), config.CLUSTER_CONFIG['notify_path'])
+    url = '{0}?{1}'.format(url, data)
+    r = requests.get(url)
+    log.info('Job {0} notified'.format(build_id))
+    during_building_dict.pop(build_id)
+
+
+@app.route("/buildcenter/build", methods=['POST'])
+def accept_build_job():
+    data_json = json.loads(request.get_data())
+    log.info('Accept job {0}: {1}'.format(data_json['id'], data_json))
+    build_info = BuildInfo(
+        project_name=data_json['projectName'],
+        module_name=data_json['moduleName'],
+        git_url=data_json['gitUrl'],
+        git_tag=data_json['gitTag'],
+        docker_image_name=data_json['imageName'],
+        docker_image_tag=data_json['imageTag'],
+        docker_image_owner=data_json['imageOwner'],
+        id=data_json['id'],
+        branch=data_json['branch']
+    )
+    build_job(build_info)
+    return "Accepted"
 
 
 @app.route("/hello")
@@ -160,6 +193,7 @@ def process_build():
 
 
 if __name__ == '__main__':
-    build_test()
+    # build_test()
     app.run(host='0.0.0.0', port=54321)
     # process_build()
+    # notify_job_finished('Build_c3961b6b-3963-4386-a7f4-f7098e680820')

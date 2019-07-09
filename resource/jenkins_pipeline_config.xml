@@ -17,6 +17,7 @@
   agent any
   environment {{
     module = '{module_name}'
+    build_id = '{build_id}'
   }}
   stages {{
     stage('Cloning Git') {{
@@ -60,7 +61,7 @@
   post {{
     always {{
       script {{
-        body = '{{"result":"' + currentBuild.currentResult + '", "projectName": "' + currentBuild.projectName + '", "number": "' + currentBuild.number + '"}}'
+        body = '{{"result":"' + currentBuild.currentResult + '", "projectName": "' + currentBuild.projectName + '", "number": "' + currentBuild.number + '", "buildId": "' + build_id + '"}}'
         httpRequest url: '{notifyHttpUrl}', httpMode: 'POST', passBuildParameters: true, consoleLogResponseBody: true, requestBody: body
       }}
     }}
