@@ -43,6 +43,11 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
         # The job will be refreshed whether it is existed or not
         with open('resource/jenkins_pipeline_config.xml') as f:
             lines = f.readlines()
+            module_option = ''
+            docker_dir = '.'
+            if build_info.module_name and len(build_info.module_name) != 0:
+                module_option = '-pl {0} -am'.format(build_info.module_name)
+                docker_dir = build_info.module_name
             job_config = ''.join(lines).format(
                 gitUrl=build_info.git_url,
                 imageTag='{0}/{1}:{2}'.format(
@@ -51,7 +56,9 @@ class JenkinsBuildProcess(base_build_process.BaseBuildProcess):
                 module_name=build_info.module_name,
                 credentialsId=config.JENKINS_CONFIG['credentials_id'],
                 branch=build_info.branch,
-                build_id=build_info.id
+                build_id=build_info.id,
+                module_option=module_option,
+                docker_dir=docker_dir
             )
 
             if JenkinsBuildProcess.J.job_exists(build_info.project_name):

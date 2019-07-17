@@ -32,7 +32,7 @@
                 maven: 'maven') {{
 
               // Run the maven build
-              sh "mvn clean package -pl {module_name} -am"
+              sh "mvn clean package {module_option}"
 
             }}
         }}
@@ -40,11 +40,7 @@
     stage('Building image') {{
       steps {{
         script {{
-          dir = '.'
-          if (module != '.') {{
-            dir = module
-          }}
-          dockerImage = docker.build '{imageTag}', dir
+            dockerImage = docker.build '{imageTag}', '{docker_dir}'
         }}
       }}
     }}

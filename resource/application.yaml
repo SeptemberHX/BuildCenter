@@ -1,0 +1,13 @@
+server:
+  port: 8803
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: {register_url}
+    healthcheck:
+      enabled: true
+spring:
+  application:
+    name: {name}
