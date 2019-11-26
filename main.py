@@ -45,34 +45,42 @@ test_build_info = BuildInfo(
     project_name='CompositionTemplate',
     git_url='git@192.168.1.104:SeptemberHX/compositiontemplate.git',
     git_tag='',
-    docker_image_name='composition02',
+    docker_image_name='composition03',
     docker_image_tag='v1.0.1',
     docker_image_owner='192.168.1.104:5000/septemberhx',
     id='1',
     module_name='',
-    branch='composition02'
+    branch='composition03'
 )
 
 composition_info = {
     'id': 'Composition_13123123123',
-    'name': 'composition02',
+    'name': 'composition09',
     'docker_tag': 'v1.0.2',
     'docker_owner': '192.168.1.104:5000/septemberhx',
-    'docker_name': 'composition01',
+    'docker_name': 'composition09',
     'dependencies': [
         {
-            'groupId': 'septemberhx',
-            'artifactId': 'SampleService3',
-            'version': '1.0-SNAPSHOT',
+            "groupId": "com.sampleservice",
+            "artifactId": "ALiService",
+            "version": "1.0-SNAPSHOT"
         },
+        {
+            "groupId": "com.sampleservice",
+            "artifactId": "WechatService",
+            "version": "1.0-SNAPSHOT"
+        }
     ],
     'chain_list': [
         {
-            'className': "com.septemberhx.sampleservice3.controller.OtherController",
-            'functionName': "wrapper"
+            'className': "com.sampleservice.ALiService.controller.MainController",
+            'functionName': "marketFunction"
+        },
+        {
+            'className': "com.sampleservice.wechatservice.controller.MainController",
+            'functionName': "payFunction"
         },
     ],
-    'register_url': 'http://192.168.1.104:30761/eureka',
 }
 
 during_building_dict = {}  # type: dict[str, BuildInfo]
@@ -210,6 +218,7 @@ def clone_repo(project_name, git_url):
             repo = git.Repo.clone_from(url=git_url, to_path=project_dir)
         else:
             repo = git.Repo(project_dir)
+        repo.git.stash('save')
         repo.git.checkout('master')
         return repo, project_dir
     except Exception as e:
@@ -220,6 +229,7 @@ def clone_repo(project_name, git_url):
 
 def create_or_checkout_branch(repo, branch):
     # create a new branch from master
+    repo.git.stash('save')
     try:
         if branch not in repo.heads:
             repo.git.branch(branch)
@@ -243,6 +253,7 @@ def commit_current_branch(repo, info):
     except Exception as e:
         log.error('Failed to commit and push')
         log.error(e)
+    repo.git.stash('save')
 
 
 def do_composition_job(composition_info):
@@ -259,7 +270,7 @@ def do_composition_job(composition_info):
 
     # write application.yaml
     with open(os.path.join(project_dir, 'src/main/resources/', 'application.yaml'), 'w') as yaml_file:
-        yaml_file.write(java_tools.generate_application_yaml(composition_info['name'], composition_info['register_url']))
+        yaml_file.write(java_tools.generate_application_yaml(composition_info['name']))
 
     # commit
     commit_current_branch(repo, composition_info['name'])
@@ -280,7 +291,8 @@ def do_composition_job(composition_info):
 
 
 if __name__ == '__main__':
-    build_test()
+    # build_test()
+    # do_composition_job(composition_info)
     app.run(host='0.0.0.0', port=54321)
     # process_build()
     # notify_job_finished('Build_c3961b6b-3963-4386-a7f4-f7098e680820')

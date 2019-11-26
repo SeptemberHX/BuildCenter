@@ -1,11 +1,11 @@
 server:
-  port: 8803
+  port: 8080
 eureka:
   instance:
     prefer-ip-address: true
   client:
     service-url:
-      defaultZone: {register_url}
+      defaultZone: http://${{MCLUSTER_IP}}:${{MCLUSTER_PORT}}/eureka
     healthcheck:
       enabled: true
 spring:

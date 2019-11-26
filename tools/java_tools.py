@@ -48,7 +48,7 @@ def generate_pom_file(dep_list):
     f_c = None
     with open('/home/hexiang/workspace/pycharm/BuildCenter/resource/composition_pom.xml') as template_file:
         f_c = ''.join(template_file.readlines())
-        return f_c.format(dependency_list=generate_dependencies(dependency_list))
+        return f_c.format(dependency_list=generate_dependencies(dep_list))
 
 
 def generate_object_definition(chain_info):
@@ -62,11 +62,11 @@ def generate_object_definition(chain_info):
 
 def generate_chain_function_body(chain_info):
     body = ""
-    index = 0
-    for info in chain_info:
-        body += 'MResponse r{0} = controller{0}.{1}(body);\n'.format(index, info['functionName'])
+    body += 'MResponse r{0} = controller{0}.{1}(body);\n'.format(0, chain_info[0]['functionName'])
+    for index in range(1, len(chain_info)):
+        body += 'MResponse r{0} = controller{0}.{1}(r{2});\n'.format(index, chain_info[index]['functionName'], index-1)
         index += 1
-    body += 'return r{0};\n'.format(index - 1)
+    body += 'return r{0};\n'.format(len(chain_info) - 1)
     return body
 
 
@@ -77,11 +77,11 @@ def generate_com_controller(chain_info):
         return f_c.format(definition=generate_object_definition(chain_info), body=generate_chain_function_body(chain_info), path='/test')
 
 
-def generate_application_yaml(name, register_url):
+def generate_application_yaml(name):
     f_c = None
     with open('/home/hexiang/workspace/pycharm/BuildCenter/resource/application.yaml') as yaml_file:
         f_c = ''.join(yaml_file.readlines())
-        return f_c.format(name=name, register_url=register_url)
+        return f_c.format(name=name)
 
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
-package com.septemberhxtest.mcomposition.controller;
+package com.septemberhx.mcomposition;
 
 import com.septemberhx.mclient.annotation.MApiFunction;
 import com.septemberhx.mclient.annotation.MFunctionType;
 import com.septemberhx.mclient.base.MObject;
-import com.septemberhx.mclient.base.MResponse;
+import com.septemberhx.common.base.MResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
