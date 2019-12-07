@@ -46,7 +46,7 @@ def generate_dependencies(dep_list):
 
 def generate_pom_file(dep_list):
     f_c = None
-    with open('/home/hexiang/workspace/pycharm/BuildCenter/resource/composition_pom.xml') as template_file:
+    with open('./resource/composition_pom.xml') as template_file:
         f_c = ''.join(template_file.readlines())
         return f_c.format(dependency_list=generate_dependencies(dep_list))
 
@@ -72,14 +72,14 @@ def generate_chain_function_body(chain_info):
 
 def generate_com_controller(chain_info):
     f_c = None
-    with open('/home/hexiang/workspace/pycharm/BuildCenter/resource/CompositionController.java') as template_file:
+    with open('./resource/CompositionController.java') as template_file:
         f_c = ''.join(template_file.readlines())
         return f_c.format(definition=generate_object_definition(chain_info), body=generate_chain_function_body(chain_info), path='/test')
 
 
 def generate_application_yaml(name):
     f_c = None
-    with open('/home/hexiang/workspace/pycharm/BuildCenter/resource/application.yaml') as yaml_file:
+    with open('./resource/application.yaml') as yaml_file:
         f_c = ''.join(yaml_file.readlines())
         return f_c.format(name=name)
 

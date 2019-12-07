@@ -20,6 +20,8 @@ import os
 from tools import pom_tools
 from tools import java_tools
 import requests
+import random
+import string
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -30,7 +32,7 @@ job_executor = ThreadPoolExecutor(10)
 
 GIT_TMP_DIR = '/tmp/buildcenter/git'
 COMPOSITION_TEMPLATE_NAME = 'CompositionTemplate'
-COMPOSITION_TEMPLATE_GIT = 'git@192.168.1.104:SeptemberHX/compositiontemplate.git'
+COMPOSITION_TEMPLATE_GIT = 'https://github.com/SampleService/compositiontemplate.git'
 
 git_info = {
     'project_name': 'MFramework',
@@ -208,9 +210,11 @@ def process_build():
 
 
 def clone_repo(project_name, git_url):
-    if not os.path.exists(GIT_TMP_DIR) or not os.path.isdir(GIT_TMP_DIR):
-        os.mkdir(GIT_TMP_DIR)
-    project_dir = os.path.join(GIT_TMP_DIR, project_name)
+    random_suffic = ''.join(random.sample(string.ascii_letters + string.digits, 12))
+    git_path = os.path.join(GIT_TMP_DIR, random_suffic)
+    if not os.path.exists(git_path) or not os.path.isdir(git_path):
+        os.mkdir(git_path)
+    project_dir = os.path.join(git_path, project_name)
 
     # clone the repo and checkout master branch
     try:
@@ -277,7 +281,7 @@ def do_composition_job(composition_info):
 
     # build
     build_info = BuildInfo(
-        project_name=COMPOSITION_TEMPLATE_NAME,
+        project_name=composition_info['name'],
         git_url=COMPOSITION_TEMPLATE_GIT,
         git_tag='',
         docker_image_name=composition_info['name'],
