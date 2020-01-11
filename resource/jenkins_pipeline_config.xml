@@ -22,7 +22,7 @@
   stages {{
     stage('Cloning Git') {{
       steps {{
-        git url: '{gitUrl}', branch: '{branch}', credentialsId: '{credentialsId}'
+        checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: '{gitUrl}', credentialsId: '{credentialsId}' ]], branches: [[name: '{branch}']]], poll: false
       }}
     }}
     stage('Maven package') {{

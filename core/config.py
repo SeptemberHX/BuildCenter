@@ -11,16 +11,16 @@
 JENKINS_CONFIG = {
     'username': 'SeptemberHX',
     'password': 'tianjianshan',
-    'server': 'http://18.216.199.79:5002/',
-    'notify_http_url': 'http://18.216.199.79:54321/buildcenter/notifyBuildJob',
+    'server': 'http://192.168.1.104:5002/',
+    'notify_http_url': 'http://192.168.1.102:54321/buildcenter/notifyBuildJob',
     'credentials_id': '489a5191-b67d-4aad-943d-94dadf733aff',
     'new_cre_id': 'd6981ee6-132a-49b0-802a-cf3bdc76165b'
 }
 
 CLUSTER_CONFIG = {
-    'server_ip': '3.136.80.127',
-    'server_port': 9001,
-    'notify_path': '/mserver/notifyJob',
+    'server_ip': '192.168.1.104',
+    'server_port': 8083,
+    'notify_path': '/job/buildNotify',
 }
 
 RABBITMQ_CONFIG = {

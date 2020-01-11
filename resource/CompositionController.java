@@ -1,6 +1,7 @@
 package com.septemberhx.mcomposition;
 
 import com.septemberhx.mclient.annotation.MApiFunction;
+import com.septemberhx.mclient.annotation.MRestApiType;
 import com.septemberhx.mclient.annotation.MFunctionType;
 import com.septemberhx.mclient.base.MObject;
 import com.septemberhx.common.base.MResponse;
@@ -16,6 +17,7 @@ public class CompositionController extends MObject {{
 
     @RequestMapping(path = "{path}", method = RequestMethod.POST)
     @MApiFunction
+    @MRestApiType
     public MResponse test(@RequestBody MResponse body) {{
         {body}
     }}

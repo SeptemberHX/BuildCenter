@@ -12,7 +12,7 @@ from urllib.parse import urlencode, urljoin
 from executor.build_executor import BuildExecutor
 from core.build_info import BuildInfo
 from core import config
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import json
 from core import logger
 import git
@@ -111,14 +111,21 @@ def build_job(build_info: BuildInfo):
 
 def notify_job_finished(build_id: str):
     try:
+        log.info('Job {0} notified'.format(build_id))
         parameter = {
-            'jobId': build_id
+            'id': build_id,
+            'success': True,
+            'imageUrl': '{0}/{1}:{2}'.format(
+                during_building_dict[build_id].docker_image_owner,
+                during_building_dict[build_id].docker_image_name,
+                during_building_dict[build_id].docker_image_tag
+            )
         }
+        log.info(parameter)
         data = urlencode(parameter)
         url = urljoin('http://{0}:{1}'.format(config.CLUSTER_CONFIG['server_ip'], config.CLUSTER_CONFIG['server_port']), config.CLUSTER_CONFIG['notify_path'])
-        url = '{0}?{1}'.format(url, data)
-        r = requests.get(url)
-        log.info('Job {0} notified'.format(build_id))
+        r = requests.post(url, json=parameter)
+        log.info(r)
         during_building_dict.pop(build_id)
     except Exception as e:
         log.error('Failed to notify server')
@@ -126,6 +133,25 @@ def notify_job_finished(build_id: str):
 
 
 @app.route("/buildcenter/build", methods=['POST'])
+def accept_new_build_job():
+    data_json = json.loads(request.get_data())
+    log.info('Accept job {0}: {1}'.format(data_json['id'], data_json))
+    build_info = BuildInfo(
+        project_name=data_json['serviceName'],
+        module_name='',
+        git_url=data_json['gitUrl'],
+        git_tag=data_json['gitTag'],
+        docker_image_name=data_json['serviceName'],
+        docker_image_owner='192.168.1.104:5000/hitices',
+        docker_image_tag=data_json['gitTag'],
+        id=data_json['id'],
+        branch=data_json['gitTag']
+    )
+    build_job(build_info)
+    return jsonify({'status': 'Success', 'valueMap': {}})
+
+
+@app.route("/buildcenter/build_old", methods=['POST'])
 def accept_build_job():
     data_json = json.loads(request.get_data())
     log.info('Accept job {0}: {1}'.format(data_json['id'], data_json))
@@ -209,12 +235,16 @@ def process_build():
     commit_current_branch(repo, git_info['build_id'])
 
 
-def clone_repo(project_name, git_url):
+def create_random_dir_in_git_tmp():
     random_suffic = ''.join(random.sample(string.ascii_letters + string.digits, 12))
     git_path = os.path.join(GIT_TMP_DIR, random_suffic)
     if not os.path.exists(git_path) or not os.path.isdir(git_path):
         os.mkdir(git_path)
-    project_dir = os.path.join(git_path, project_name)
+    return git_path
+
+
+def clone_repo(project_name, git_url):
+    project_dir = os.path.join(create_random_dir_in_git_tmp(), project_name)
 
     # clone the repo and checkout master branch
     try:
