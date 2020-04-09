@@ -106,7 +106,8 @@ def jenkins_message_receiver():
 def build_job(build_info: BuildInfo):
     log.info('Start to build {0}: {1}'.format(build_info.id, build_info))
     during_building_dict[build_info.id] = build_info
-    build_executor.execute(build_info)
+    # build_executor.execute(build_info)
+    notify_job_finished(build_info.id)
 
 
 def notify_job_finished(build_id: str):
@@ -141,8 +142,8 @@ def accept_new_build_job():
         module_name='',
         git_url=data_json['gitUrl'],
         git_tag=data_json['gitTag'],
-        docker_image_name=data_json['serviceName'],
-        docker_image_owner='192.168.1.104:5000/hitices',
+        docker_image_name=data_json['serviceName'].lower(),
+        docker_image_owner='septemberhx',
         docker_image_tag=data_json['gitTag'],
         id=data_json['id'],
         branch=data_json['gitTag']
